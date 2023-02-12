@@ -1,0 +1,50 @@
+Install
+---------
+1.sudo apt-get install postgresql
+2.curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+3.sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+4.sudo apt install pgadmin4
+5.sudo apt install pgadmin4-desktop
+6.sudo apt install pgadmin4-web
+
+Run
+----
+
+0.sudo /usr/pgadmin4/bin/setup-web.sh
+1.sudo -i -u postgres
+2.sudo service postgresql start
+3.psql
+4.create database tab;
+5.create user taib with password 'postgres';
+6.
+/*
+*grant all privileges on database tab to taib;
+*grant connect on database tab to taib;
+*grant usage on schema public to taib;
+*grant select on all tables in schema public to taib; //
+*alter default privileges in schema public grant select on tables to taib;
+*/
+7.\c tab
+8.create table car (name char(20),price char(6));
+8.1.alter table student add "cgpa" char(5);
+9.insert into car values ('Ferari','2000');
+10.SELECT * FROM car;
+11.\z
+12. sudo -u postgres dropuser taib -e #at main user
+delete
+-------
+1. drop owned by [role name]
+2. drop role [role name]
+
+read from file
+--------------
+1.copy public.student2 from '/var/lib/psql/new.csv' with (format csv,header true,quote '"');
+2.copy public.student2 from '/var/lib/psql/new.csv' with delimiter ',' csv header;
+3.copy public.student2 from '/var/lib/psql/new.txt' with delimiter ',' csv header;
+checking
+---------
+1.sudo pg_isready
+2.sudo systemctl is-active postgresql
+3.sudo systemctl is-enabled postgresql
+4.sudo systemctl status postgresql
+
