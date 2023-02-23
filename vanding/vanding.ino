@@ -34,10 +34,10 @@ const int motorPin1 = D0;
 const int motorPin2 = D1;
 const int motorPin3 = D2;
 const int motorPin4 = D3;
-const int motorPin5 = D4;
-const int motorPin6 = D5;
-const int motorPin7 = D6;
-const int motorPin8 = D7;
+const int motorPin5 = D5;
+const int motorPin6 = D6;
+const int motorPin7 = D7;
+const int motorPin8 = D8;
 
 Stepper stepper(stepsPerRevolution, motorPin1, motorPin3, motorPin2, motorPin4);
 Stepper stepper2(stepsPerRevolution, motorPin5, motorPin6, motorPin7, motorPin8);
@@ -54,62 +54,69 @@ void setup() {
   Serial.println("connected: ");
   delay(500);
   Serial.println(WiFi.localIP());
-  stepper.setSpeed(65);
-  stepper2.setSpeed(50);
+  stepper.setSpeed(70);
+  delay(2000);
+  stepper2.setSpeed(70);
+  delay(2000);
   Firebase.begin(FIREBASE_HOST);
 }
 
-String tmp1 = "",tmp2 = "";
-bool tmp3 = "";
 int stepCount = 0;
 
 void customer(String value1,String value2,bool value3)
 {
-  for(int i = 1; i <= 2; ++i)
+  if(value2 == "Kitkat")
   {
-    delay(1000);
-    for(int j = 1; j <= 5; ++j)
+    for(int i = 1; i <= 2; ++i)
     {
-      stepper.step(stepsPerRevolution);
       delay(1000);
-      stepper2.step(stepsPerRevolution);
+      for(int j = 1; j <= 5; ++j)
+      {
+        stepper.step(stepsPerRevolution);
+        delay(1500);
+      }
+      Serial.println("output");
       delay(1000);
     }
-    Serial.println("output");
-    delay(1000);
   }
+  else if(value2 == "Chips")
+  {
+    for(int i = 1; i <= 2; ++i)
+    {
+      delay(1000);
+      for(int j = 1; j <= 5; ++j)
+      {
+        stepper2.step(-stepsPerRevolution);
+        delay(1500);
+      }
+      Serial.println("output");
+      delay(1000);
+    }
+  }
+  return;  
   Serial.println("Money = " + value1 + " ,Option = " + value2 + " ,Status = " + value3);
 }
+
+String tmp1 = Firebase.getString("/Payment/Money");
+String tmp2 = "no";
+bool tmp3 = Firebase.getString("/Payment/Payment Status");
 
 void loop() {
   String value1 = Firebase.getString("/Payment/Money");
   String value2 = Firebase.getString("/Payment/Option");
   bool value3 = Firebase.getString("/Payment/Payment Status");
-  
-  if(value1 == tmp1)
+  Serial.println("value2->options = " + value2);
+  if(value2 != tmp2 && tmp2 != "no")
   {
-    if(value2 == tmp2)
-    {
-      if(value3 == tmp3)
-      {
-        Serial.println("Please Take something");
-      }
-      else
-      {
-        customer(value1,value2,value3);
-      }
-    }
-    else
-    {
-      customer(value1,value2,value3);
-    }
+    customer(value1,value2,value3);
   }
   else
   {
-    customer(value1,value2,value3);
-  }  
-  delay(1000);
-  // tmp1 = Firebase.getString("/Payment/Money");
-  // tmp2 = Firebase.getString("/Payment/Option");
-  // tmp3 = Firebase.getString("/Payment/Payment Status");  
+    Serial.println("Please Take something");
+  }
+  tmp1 = Firebase.getString("/Payment/Money");
+  tmp2 = Firebase.getString("/Payment/Option");
+  tmp3 = Firebase.getString("/Payment/Payment Status");
+  Serial.println("tmp->options = " + tmp2);
+  delay(6000);
 }
