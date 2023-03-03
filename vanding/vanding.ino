@@ -55,68 +55,72 @@ void setup() {
   delay(500);
   Serial.println(WiFi.localIP());
   stepper.setSpeed(70);
-  delay(2000);
+  delay(500);
   stepper2.setSpeed(70);
-  delay(2000);
-  Firebase.begin(FIREBASE_HOST);
+  delay(500);
+  Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
 }
 
 int stepCount = 0;
 
-void customer(String value1,String value2,bool value3)
+void customer(String value1,String value2)
 {
+  Serial.println("Processing for " + value2 + " ......");
   if(value2 == "Kitkat")
   {
     for(int i = 1; i <= 2; ++i)
     {
-      delay(1000);
       for(int j = 1; j <= 5; ++j)
       {
         stepper.step(stepsPerRevolution);
-        delay(1500);
+        delay(1000);
+        Serial.print("..");
       }
-      Serial.println("output");
-      delay(1000);
     }
+    Serial.println("");
   }
-  else if(value2 == "Chips")
+  else if(value2 == "Cake")
   {
     for(int i = 1; i <= 2; ++i)
     {
-      delay(1000);
       for(int j = 1; j <= 5; ++j)
       {
         stepper2.step(-stepsPerRevolution);
-        delay(1500);
+        delay(1000);
+        Serial.print("..");
       }
-      Serial.println("output");
-      delay(1000);
     }
+    Serial.println("");
   }
+  Serial.println("Thank you purchased " + value2 + " successfully");
   return;  
-  Serial.println("Money = " + value1 + " ,Option = " + value2 + " ,Status = " + value3);
 }
 
 String tmp1 = Firebase.getString("/Payment/Money");
-String tmp2 = "no";
-bool tmp3 = Firebase.getString("/Payment/Payment Status");
+String tmp2 = Firebase.getString("/Payment/Option");
+String tmp4 = "-1" ;
 
 void loop() {
+  tmp1 = Firebase.getString("/Payment/Money");
+  tmp2 = Firebase.getString("/Payment/Option");
+  String tmp3 = Firebase.getString("/Payment/Step");
+  Serial.println("Do you wanna take something?");
+  delay(1000);
   String value1 = Firebase.getString("/Payment/Money");
   String value2 = Firebase.getString("/Payment/Option");
-  bool value3 = Firebase.getString("/Payment/Payment Status");
-  Serial.println("value2->options = " + value2);
-  if(value2 != tmp2 && tmp2 != "no")
+  String value3 = Firebase.getString("/Payment/Step");
+  Serial.println("option = " + value2);
+  Serial.println("step = " + value3);
+
+  bool bb = 0;
+  if((value3 != tmp3) || (tmp4 != "-1"))
+    bb = 1;
+  if(bb)
   {
-    customer(value1,value2,value3);
+    customer(value1,value2);
   }
   else
   {
     Serial.println("Please Take something");
   }
-  tmp1 = Firebase.getString("/Payment/Money");
-  tmp2 = Firebase.getString("/Payment/Option");
-  tmp3 = Firebase.getString("/Payment/Payment Status");
-  Serial.println("tmp->options = " + tmp2);
-  delay(6000);
 }
